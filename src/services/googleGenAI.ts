@@ -32,7 +32,7 @@ const AddTaskFunctionDeclaration = {
 const functionDeclarations = [AddTaskFunctionDeclaration]
 
 
-export async function main(prompt) {
+export async function main(prompt: string) {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -61,4 +61,4 @@ export async function main(prompt) {
   }
 }
 
-await main("hi");
+main("how can i make money with AI eg. using gemini ai function calling feature");

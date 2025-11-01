@@ -32,7 +32,7 @@ export const getTasks = async (req: Request, res: Response, next: NextFunction) 
         }
 
         // Return the data if successful
-        await main();
+        await main("how can i make money with AI eg. using gemini ai function calling feature");
         return res.json(data);
 
     } catch (err) {

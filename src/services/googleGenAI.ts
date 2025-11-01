@@ -8,7 +8,7 @@ const ai = new GoogleGenAI({});
 // defining AI executable function
 const AddTaskFunctionDeclaration = {
   name: 'add_task',
-  description: 'add task with specified due_date, properties:{low, medium, high }.',
+  description: 'add task with specified due_date, properties:{low, medium, high }. or give general text response',
   parameters: {
     type: Type.OBJECT,
     properties: {

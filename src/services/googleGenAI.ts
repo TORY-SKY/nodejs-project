@@ -33,6 +33,7 @@ const functionDeclarations = [AddTaskFunctionDeclaration]
 
 
 export async function main(prompt: string) {
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -55,10 +56,13 @@ export async function main(prompt: string) {
     } else {
       console.log("No function call found in the response.");
       console.log(response.text);
+
+      return response.text
+
     }
   } catch (error) {
     console.error("Error calling Gemini:", error);
   }
+
 }
 
-main("how can i make money with AI eg. using gemini ai function calling feature");

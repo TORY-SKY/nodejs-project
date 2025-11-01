@@ -1,8 +1,7 @@
-// import { Router } from 'express';
 import { Router, Response, Request } from 'express';
 import { getTasks, createTask, deleteTask, updateTask} from '../controllers/tasksController';
 import {Task} from "../models/tasks"
-import sql from "../services/db"
+
 
 const router = Router();
 

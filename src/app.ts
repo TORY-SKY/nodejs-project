@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import router from './routes/task';
+import router from './routes/taskRouter';
+import chatRouter from "./routes/chatRouter"
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 
 // api
 app.use('/api/tasks', router);
+app.use('/api/chat', chatRouter);
 // for default / browser route
 app.use('/', router);
 

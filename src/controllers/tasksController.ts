@@ -32,7 +32,6 @@ export const getTasks = async (req: Request, res: Response, next: NextFunction) 
         }
 
         // Return the data if successful
-        await main("how can i make money with AI eg. using gemini ai function calling feature");
         return res.json(data);
 
     } catch (err) {
@@ -156,39 +155,44 @@ export const updateTask = async (req: Request, res: Response)=>{
 // this part is where ai handles the crud
 export const AI_createTask = async (req: Request, res: Response) => {
   try {
-    const { title, priority, due_date } = req.body as Partial<Task>;
+    const {history, prompt} = req.body;
 
     // ✅ Step 1: Validate inputs
-    if (!title || typeof title !== "string") {
-      return res.status(400).json({ error: "Invalid title" });
+    if (!prompt) {
+      return res.status(400).json({ error: "Invalid prompt" });
     }
+    const gemini_response = await main(prompt);
+    console.log(gemini_response);
+    console.log(`the AI response to your prompt is ${gemini_response}`);
+    console.log(gemini_response);
+
 
     // ✅ Step 2: Prepare the data to insert
-    const newTask = {
-      title: title.trim(),
-      priority: priority ?? 0, // if no priority given, default to 0
-      // due_date: due_date ?? null, // optional field
-    };
+    // const newTask = {
+    //   title: title.trim(),
+    //   priority: priority ?? 0, // if no priority given, default to 0
+    //   // due_date: due_date ?? null, // optional field
+    // };
 
     // ✅ Step 3: Insert into Supabase
-    const { data, error } = await supabase
-      .from("tasks")
-      .insert([newTask])
-      .select("*")
-      .single();
+    // const { data, error } = await supabase
+    //   .from("tasks")
+    //   .insert()
+    //   .select("*")
+    //   .single();
 
     // ✅ Step 4: Handle database errors
-    if (error) {
-      console.error("Supabase insert error:", error.message);
-      return res
-        .status(500)
-        .json({ error: "Failed to create task. Please try again later." });
-    }
+    // if (error) {
+    //   console.error("Supabase insert error:", error.message);
+    //   return res
+    //     .status(500)
+    //     .json({ error: "Failed to create task. Please try again later." });
+    // }
 
     // ✅ Step 5: Success response
     return res.status(201).json({
-      message: "Task created successfully",
-      task: data,
+      message: "prompt received",
+      ai: gemini_response,
     });
   } catch (err) {
     // ✅ Step 6: Catch unexpected errors

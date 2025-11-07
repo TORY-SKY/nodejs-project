@@ -192,7 +192,7 @@ export const AI_createTask = async (req: Request, res: Response) => {
     // ✅ Step 5: Success response
     return res.status(201).json({
       message: "prompt received",
-      ai: {text: gemini_response},
+      ai:  gemini_response,
       functionCall: "functionCall"
     });
   } catch (err) {

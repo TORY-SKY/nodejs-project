@@ -9,7 +9,13 @@ interface ai_added_taskItem {
   due_date: string
 
 }
-const ai = new GoogleGenAI({});
+const apiKey = process.env.GEMINI_API_KEY; 
+if (!apiKey) {
+  throw new Error("GEMINI_API_KEY environment variable not set.");
+}
+
+const ai = new GoogleGenAI({ apiKey: apiKey });
+// const ai = new GoogleGenAI({});
 
 
 

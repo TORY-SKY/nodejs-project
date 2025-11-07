@@ -1,6 +1,14 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import {createTask, deleteTask, updateTask} from "../controllers/tasksController"
+import { supabase } from '../services/supabaseClient';
 
+
+interface ai_added_taskItem {
+  completed: boolean,
+  title: string,
+  due_date: string
+
+}
 const ai = new GoogleGenAI({});
 
 
@@ -8,7 +16,7 @@ const ai = new GoogleGenAI({});
 // defining AI executable function
 const AddTaskFunctionDeclaration = {
   name: 'add_task',
-  description: 'add task with specified due_date, properties:{low, medium, high }. or give general text response',
+  description: 'add task with specified due_date, priority: low, medium, or high. or give general text response',
   parameters: {
     type: Type.OBJECT,
     properties: {
@@ -24,15 +32,43 @@ const AddTaskFunctionDeclaration = {
         type: Type.BOOLEAN,
         description: 'this confirms whether the task is completed or not using boolean (true/false)',
       },
+      priority: {
+        type: Type.STRING,
+        description: 'this determine the priority of the task either high, medium or low priority',
+      },
       
     },
-    required: ['title', 'due_date', 'completed'],
+    required: ['title', 'due_date', 'completed', 'priority' ],
   },
 };
+
+
 const functionDeclarations = [AddTaskFunctionDeclaration]
 
 
-export async function main(prompt: string) {
+  const add_Task = async (tasks: any)=>{
+     const { data, error } = await supabase
+      .from("tasks")
+      .insert([tasks])
+      .select("*")
+      .single();
+
+    // ✅ Step 4: Handle database errors
+    if (error) {
+      console.error("Supabase insert error:", error.message);
+      return error.message
+      
+    }
+    //  return data;
+    // console.log("the task said");
+
+    console.log(tasks)
+    // console.log("the task said");
+
+
+}
+
+export async function main(prompt: string, history: []) {
 
   try {
     const response = await ai.models.generateContent({
@@ -47,21 +83,35 @@ export async function main(prompt: string) {
       },
     });
 
-    // 4️⃣ Check if the AI wants to call your function
-    if (response.functionCalls && response.functionCalls.length > 0) {
-      const functionCall = response.functionCalls[0];
-      console.log(`Function to call: ${functionCall.name}`);
-      console.log(`Arguments: ${JSON.stringify(functionCall.args)}`);
-      console.log(functionCall);
-    } else {
-      console.log("No function call found in the response.");
-      console.log(response.text);
+// ✅ Step 4: Check if the AI wants to call your function
+if (!response.functionCalls || response.functionCalls.length === 0) {
+  console.log("No function call found in the response.");
+  return {
+    text: response.text,
+    functionCall: null,
+  };
+}
 
-      return response.text
+// ✅ Extract the first function call
+const [functionCall] = response.functionCalls;
 
-    }
+// ✅ Optional: Log the function name and arguments for debugging
+// console.log(`Function to call: ${functionCall.name}`);
+// console.log("Function arguments:", JSON.stringify(functionCall.args, null, 2));
+
+if (!functionCall.args) {
+  console.warn("Function call received without arguments:", functionCall);
+  return ;
+}
+
+// ✅ Safely cast the arguments to the expected type
+const theTask = functionCall.args as unknown as ai_added_taskItem;
+
+// ✅ Execute the function (e.g., adding the task)
+await add_Task(theTask);
+return {text: `task saved successfully`};
   } catch (error) {
-    console.error("Error calling Gemini:", error);
+    // console.error("Error calling Gemini:", error);
   }
 
 }

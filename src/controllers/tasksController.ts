@@ -161,7 +161,7 @@ export const AI_createTask = async (req: Request, res: Response) => {
     if (!prompt) {
       return res.status(400).json({ error: "Invalid prompt" });
     }
-    const gemini_response = await main(prompt);
+    const gemini_response = await main(prompt, history);
     console.log(gemini_response);
     console.log(`the AI response to your prompt is ${gemini_response}`);
     console.log(gemini_response);
@@ -192,7 +192,8 @@ export const AI_createTask = async (req: Request, res: Response) => {
     // ✅ Step 5: Success response
     return res.status(201).json({
       message: "prompt received",
-      ai: gemini_response,
+      ai: {text: gemini_response},
+      functionCall: "functionCall"
     });
   } catch (err) {
     // ✅ Step 6: Catch unexpected errors
